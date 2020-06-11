@@ -1,0 +1,129 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('maps-project:server');
+var http = require('http');
+const { Client, Pool } = require('pg')
+/**
+ * Get port from environment and store in Express.
+ */
+const client = new Client({
+  host: "localhost",
+  port: 5432,
+  database: "Maps",
+  user: "postgres",
+  password: "1407"
+})
+
+const pool = new Pool({
+  host: "localhost",
+  port: 5432,
+  database: "Maps",
+  user: "postgres",
+  password: "1407"
+})
+
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = http.createServer(app);
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+pool.query("SELECT NOW()")
+  .then(res => {
+    res, console.log('CONNECTED TO PGSQL');
+  })
+  .catch(err => {
+    err, console.log('FAILED TO CONNECT PGSQL');
+  });
+client.connect();
+// new Promise((resolve, reject) => {
+// }) 
+// pg.connect('postgres://postgres:1407@localhost:5432/Maps', function(err, client) {
+//  if(err) {
+//     console.log(err);
+//  }
+
+//  // Listen for all pg_notify channel messages
+//  client.on('notification', function(msg) {
+//    let payload = JSON.parse(msg.payload);
+//    dbEventEmitter.emit(msg.channel, payload);
+//  });
+
+//  // Designate which channels we are listening on. Add additional channels with multiple lines.
+//  client.query('LISTEN new_order');
+// });
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

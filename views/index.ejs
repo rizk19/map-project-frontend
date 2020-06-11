@@ -1,0 +1,31 @@
+<% include ./partial/header %>
+
+<div style="display: flex;">
+    <div style="flex: 2;margin-right: 5px;">
+        <div id="map" class="map">
+            <div id="popup"></div>
+            <div id="map-spinner" class="text-center align-content-center">
+                <div class="text-center align-self-center" style="padding-top: 30vh;">
+                    <div class="spinner-border" style="width: 10rem; height: 10rem;" role="status">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="">&nbsp;</div>
+        <button type="button" class="btn btn-light" id="rotate-left" title="Rotate clockwise">↻</button>
+        <button type="button" class="btn btn-light" id="rotate-right" title="Rotate counterclockwise">↺</button>
+        <button type="button" class="btn btn-light" id="fly-to-jakarta">Jakarta</button>
+        <button type="button" class="btn btn-light" id="fly-to-balikpapan">Balikpapan</button>
+        <button type="button" class="btn btn-light" id="fly-to-papua">Papua</button>
+        <button type="button" class="btn btn-light" id="fly-to-makasar">Makasar</button>
+        <button type="button" class="btn btn-light" id="fly-to-jatim">Jatim</button>
+        <button type="button" class="btn btn-light" id="fly-to-bali">Bali</button>
+        <button type="button" class="btn btn-light" id="fly-to-kupang">Kupang</button>
+        <button type="button" class="btn btn-light" id="fly-to-aceh">Aceh</button>
+        <button type="button" class="btn btn-light" id="fly-to-lampung">Lampung</button>
+    </div>
+    <div id="table-click" style="height: 90vh; overflow-y: scroll;">
+    </div>
+</div>
+
+<% include ./partial/footer %>

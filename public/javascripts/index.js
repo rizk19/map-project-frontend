@@ -1,118 +1,31 @@
-// var moment = require('moment');
-
-const loadTable = () => {
-  $.ajax({
-    url: 'http://localhost:5000/maps',
-    method: 'get'
-  })
-    .then(dataTable => {
-      let scripts = ''
-      dataTable.data.forEach((item, index) => {
-        scripts += `<tr>
-                        <th>${index + 1}</th>
-                        <td class='text-center'>${item.latitude}</td>
-                        <td class='text-center'>${item.longitude}</td>
-                        <td class='text-center'>${item.speed}</td>
-                        <td class='text-center'>${item.course}</td>
-                        <td class="text-center" style="width: 150px;"><img src="${item.imagedata1}" class="img-fluid img-thumbnail" alt="imagedata1" /></td>
-                        <td class="text-center" style="width: 150px;"><img src="${item.imagedata2}" class="img-fluid img-thumbnail" alt="imagedata2" /></td>
-                        <td class="text-center" style="width: 150px;"><img src="${item.imagedata3}" class="img-fluid img-thumbnail" alt="imagedata3" /></td>
-                    </tr>`
-      });
-      $('#table-data tbody').html(scripts)
-    })
-}
-
-
+let socketMaps = io.connect('http://localhost:5000/mapsocke');
 $(document).ready(() => {
-  loadTable();
-
-  const socket = io.connect('http://localhost:5000/mapsocke');
-  function offSocket(params) {
-      socket.removeAllListeners(["data"])
-  }
   let rawData = []
+  let scripts = `<table class="table table-hover">
+                  <thead class="thead-light">
+                      <tr>
+                          <th scope="col">Longitude</th>
+                          <th scope="col">Latitude</th>
+                          <th scope="col">Speed</th>
+                          <th scope="col">Course</th>
+                          <th scope="col">Image 1</th>
+                          <th scope="col">Image 2</th>
+                          <th scope="col">Image 3</th>
+                      </tr>
+                  </thead>
+                  <tbody>`
+  $("#progress-map").hide()
+  let lastscript = `</tbody></table>`
 
-  setTimeout(() => {
-    
-    if (rawData.length === 0) {
-      rawData.push(new ol.Feature({
-        geometry: new ol.geom.Point(new ol.proj.fromLonLat([106.892348, -6.183103])),
-        longitude: 106.892348,
-        latitude: -6.183103,
-        time: new moment(new Date()).format('DD-MM-YYYY'),
-        speed: 0.123,
-        course: 0.321,
-        imagedata1: null,
-        imagedata2: null,
-        imagedata3: null
-      }))
+  socketMaps.emit('requestListDirectory', 'CONNECT');
 
-      var bluePoint = new ol.style.Circle({
-        radius: 5,
-        fill: null,
-        stroke: new ol.style.Stroke({ color: 'blue', width: 1 })
-      });
+  socketMaps.on("data", (params) => {
+    // console.log('index.js line 7 ===> PARAMS', params);
 
-      var stylesBlue = {
-        'Point': new ol.style.Style({
-          image: bluePoint
-        }),
-        'LineString': new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: '#f00',
-            width: 2
-          })
-        }),
-        'MultiLineString': new ol.style.Style({
-          stroke: new ol.style.Stroke({
-            color: '#0f0',
-            width: 2
-          })
-        })
-      };
-
-      var styleFunctionRed = function (feature) {
-        return stylesBlue[feature.getGeometry().getType()];
-      };
-  
-      var iconFeature =
-      {
-        features: rawData
-      }
-  
-      var iconSource = new ol.source.Vector(iconFeature);
-  
-      var iconLayer = new ol.layer.Vector({
-        source: iconSource,
-        style: styleFunctionRed
-      });
-  
-      var view = new ol.View({
-        center: new ol.proj.fromLonLat([106.892348, -6.183103]),
-        zoom: 10
-      });
-  
-      map = new ol.Map({
-        target: document.getElementById('map'),
-        layers: [
-          new ol.layer.Tile({
-            preload: 4,
-            source: new ol.source.OSM()
-          }),
-          iconLayer
-        ],
-        view: view
-      });
-    }
-      $("div").remove("#map-spinner");
-    }, 3000);
-    // let firstData = new ol.proj.fromLonLat([106.892348, -6.183103]);
-  socket.on("data", (data) => {
-    let firstData = new ol.proj.fromLonLat([data[0].longitude, data[0].latitude])
+    let firstData = new ol.proj.fromLonLat([params.data[0].longitude, params.data[0].latitude])
     $(".map").empty();
-    if (data) {
-      data.map((item) => {
+    if (params) {
+      params.data.map((item) => {
         rawData.push(new ol.Feature({
           geometry: new ol.geom.Point(new ol.proj.fromLonLat([item.longitude, item.latitude])),
           longitude: item.longitude,
@@ -125,12 +38,34 @@ $(document).ready(() => {
           imagedata3: item.imagedata3
         }))
       });
+      params.data.forEach((item, index) => {
+        let srcImg1 = item.imagedata1 ? `${item.imagedata1}` : "../images/no_image.jpg"
+        let srcImg2 = item.imagedata2 ? `${item.imagedata2}` : "../images/no_image.jpg"
+        let srcImg3 = item.imagedata3 ? `${item.imagedata3}` : "../images/no_image.jpg"
+        scripts += `<tr>
+                      <td>${item.latitude}</td>
+                      <td>${item.longitude}</td>
+                      <td>${item.speed}</td>
+                      <td>${item.course}</td>
+                      <td class="text-center" style="width: 150px;"><img src="${srcImg1}" class="img-fluid img-thumbnail" alt="imagedata1" /></td>
+                      <td class="text-center" style="width: 150px;"><img src="${srcImg2}" class="img-fluid img-thumbnail" alt="imagedata2" /></td>
+                      <td class="text-center" style="width: 150px;"><img src="${srcImg3}" class="img-fluid img-thumbnail" alt="imagedata3" /></td>
+                    </tr>`
+      });
+      $('#table-data').html(scripts+lastscript)
       $("div").remove("#map-spinner");
+      $("div").remove("#table-spinner");
     }
-    // if (rawData.length >= 7200) {
-    //   offSocket()
-    // }
+
+    let resultlength = Math.ceil((rawData.length / params.length.total) * 100)
+    // console.log('index.js line 46 ===> resultlength', resultlength);
+    $("#progress-map").show()
     
+    $("#progress-map-value").css({ "width": resultlength + '%' })
+    $("#progress-map-value").text(resultlength + '%')
+    if (resultlength == 100) {
+      $("#progress-map").html('')
+    }
 
     var jakarta = new ol.proj.fromLonLat([106.892348, -6.183103]);
     var jatim = new ol.proj.fromLonLat([114.371043, -8.216925]);
@@ -170,14 +105,6 @@ $(document).ready(() => {
       return stylesRed[feature.getGeometry().getType()];
     };
 
-    let dummy = [new ol.Feature({
-      geometry: new ol.geom.Point(new ol.proj.fromLonLat([106.892348, -6.183103])),
-      longitude: '106.892348',
-      latitude: '-6.183103',
-      time: '01-0101-01',
-      speed: '0.121',
-      course: '0.232'
-    })]
     var iconFeature =
     {
       features: rawData
@@ -285,27 +212,34 @@ $(document).ready(() => {
           allClickedData.push(features[i].getProperties());
         }
         let scriptsclick =
-          `<table class="table table-hover">
-            <thead class="thead-light">
-                <tr>
-                <th scope="col">No.</th>
-                <th scope="col">Longitude</th>
-                <th scope="col">Latitude</th>
-                <th scope="col">Speed</th>
-                <th scope="col">Course</th>
-                <th scope="col">Image 1</th>
-                <th scope="col">Image 2</th>
-                <th scope="col">Image 3</th>
-                </tr>
-            </thead>`
+          `<div>
+            <button id="close-table-click"
+            style="background-color:tomato; color: aliceblue; padding: 0 5px; margin-bottom: 5px;"
+            type="button" class="close sticky-top" aria-label="Close"
+              data-toggle="tooltip" data-placement="left" title="Close Table">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <table class="table table-hover">
+              <thead class="thead-light">
+                  <tr>
+                  <th scope="col">No.</th>
+                  <th class='text-center' scope="col">Longitude</th>
+                  <th class='text-center' scope="col">Latitude</th>
+                  <th class='text-center' scope="col">Speed</th>
+                  <th class='text-center' scope="col">Course</th>
+                  <th scope="col">Image 1</th>
+                  <th scope="col">Image 2</th>
+                  <th scope="col">Image 3</th>
+                  </tr>
+              </thead>`
         allClickedData.forEach((item, index) => {
           let srcImg1 = item.imagedata1 ? `${item.imagedata1}` : "../images/no_image.jpg"
           let srcImg2 = item.imagedata2 ? `${item.imagedata2}` : "../images/no_image.jpg"
           let srcImg3 = item.imagedata3 ? `${item.imagedata3}` : "../images/no_image.jpg"
           scriptsclick += `<tr>`
           scriptsclick += `<th>${index + 1}</th>`
-          scriptsclick += `<td class='text-center'>${item.latitude}</td>`
           scriptsclick += `<td class='text-center'>${item.longitude}</td>`
+          scriptsclick += `<td class='text-center'>${item.latitude}</td>`
           scriptsclick += `<td class='text-center'>${item.speed}</td>`
           scriptsclick += `<td class='text-center'>${item.course}</td>`
           scriptsclick += `<td class="text-center" style="width: 100px;"><img src=${srcImg1} class="img-fluid img-thumbnail" alt="imagedata1" /></td>`
@@ -313,11 +247,18 @@ $(document).ready(() => {
           scriptsclick += `<td class="text-center" style="width: 100px;"><img src=${srcImg3} class="img-fluid img-thumbnail" alt="imagedata3" /></td>`
           scriptsclick += `</tr>`
         });
-        let lastclick = `</table>`
+        let lastclick = `</table></div>`
+        $("#table-click").show();
         $('#table-click').html(scriptsclick + lastclick)
         view.animate({
           center: new ol.proj.fromLonLat([allClickedData[0].longitude, allClickedData[0].latitude]),
           duration: 2000
+        });
+        $('#close-table-click').click(function () {
+          $("#table-click").fadeToggle(500);
+          setTimeout(() => {
+            $('#table-click').html('')
+          }, 500);
         });
         map.getTarget().style.cursor = 'pointer';
       } else {
@@ -379,8 +320,15 @@ $(document).ready(() => {
     });
   })
 
-  socket.on("stopper", (indicator) => {
-    alert(indicator.status+"!")
+  socketMaps.on("stopper", (indicator) => {
+    Swal.fire({
+      position: 'top-end',
+      icon: 'success',
+      title: 'Database selesai dibaca.',
+      showConfirmButton: false,
+      timer: 1000
+    })
+    $("#progress-map").html('')
   })
 
   $(".map").css({ "width": "100%", "height": (window.innerHeight - 170) });

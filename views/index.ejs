@@ -1,30 +1,56 @@
 <% include ./partial/header %>
+<% include ./modal/databaseList %>
 
-<div style="display: flex;">
-    <div style="flex: 2;margin-right: 5px;">
-        <div id="map" class="map">
-            <div id="popup"></div>
-            <div id="map-spinner" class="text-center align-content-center">
-                <div class="text-center align-self-center" style="padding-top: 30vh;">
-                    <div class="spinner-border" style="width: 10rem; height: 10rem;" role="status">
+<div class="tab-content" id="pills-tabContent" >
+    <div class="tab-pane fade show active in" id="pills-home" role="tabpanel" aria-labelledby="pills-home-tab">
+        <div style="display: flex;">
+            <div style="flex: 2;margin-right: 5px;">
+                <div id="progress-map" >
+                    <div class="progress">
+                        <div id="progress-map-value" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                     </div>
                 </div>
+                <div id="map" class="map">
+                    <div id="popup"></div>
+                    <div id="map-spinner" class="text-center align-self-center" style="padding-top: 150px;">
+                        <div class="loadingio-spinner-magnify-z7f4e78j39"><div class="ldio-905eu4zn7tq">
+                            <div><div><div></div><div></div></div></div>
+                            </div></div>
+                        <h2>Masukkan USB</h2>
+                        <p style="font-size: x-small; color: red;">(bila sudah terpasang, dimohon untuk memasukkan ulang)</p>
+                        <div>
+                            <p>Atau pilih dari directori database komputer</p>
+                            <u id="direktori-list" style="cursor: pointer; color: royalblue;">pilih disini</u>
+                        </div>
+                    </div>
+                </div>
+                <div id="">&nbsp;</div>
+                <button type="button" class="btn btn-light" id="rotate-left" title="Rotate clockwise">↻</button>
+                <button type="button" class="btn btn-light" id="rotate-right" title="Rotate counterclockwise">↺</button>
+                <button type="button" class="btn btn-light" id="fly-to-jakarta">Jakarta</button>
+                <button type="button" class="btn btn-light" id="fly-to-balikpapan">Balikpapan</button>
+                <button type="button" class="btn btn-light" id="fly-to-papua">Papua</button>
+                <button type="button" class="btn btn-light" id="fly-to-makasar">Makasar</button>
+                <button type="button" class="btn btn-light" id="fly-to-jatim">Jatim</button>
+                <button type="button" class="btn btn-light" id="fly-to-bali">Bali</button>
+                <button type="button" class="btn btn-light" id="fly-to-kupang">Kupang</button>
+                <button type="button" class="btn btn-light" id="fly-to-aceh">Aceh</button>
+                <button type="button" class="btn btn-light" id="fly-to-lampung">Lampung</button>
+            </div>
+            <div id="table-click" class="table-click-style">
             </div>
         </div>
-        <div id="">&nbsp;</div>
-        <button type="button" class="btn btn-light" id="rotate-left" title="Rotate clockwise">↻</button>
-        <button type="button" class="btn btn-light" id="rotate-right" title="Rotate counterclockwise">↺</button>
-        <button type="button" class="btn btn-light" id="fly-to-jakarta">Jakarta</button>
-        <button type="button" class="btn btn-light" id="fly-to-balikpapan">Balikpapan</button>
-        <button type="button" class="btn btn-light" id="fly-to-papua">Papua</button>
-        <button type="button" class="btn btn-light" id="fly-to-makasar">Makasar</button>
-        <button type="button" class="btn btn-light" id="fly-to-jatim">Jatim</button>
-        <button type="button" class="btn btn-light" id="fly-to-bali">Bali</button>
-        <button type="button" class="btn btn-light" id="fly-to-kupang">Kupang</button>
-        <button type="button" class="btn btn-light" id="fly-to-aceh">Aceh</button>
-        <button type="button" class="btn btn-light" id="fly-to-lampung">Lampung</button>
     </div>
-    <div id="table-click" style="height: 90vh; overflow-y: scroll;">
+    <div class="tab-pane fade" id="pills-table" role="tabpanel" aria-labelledby="pills-table-tab">
+        <div id="table-data">
+            <div id="table-spinner" class="text-center align-self-center" style="padding-top: 150px;">
+                <div class="loadingio-spinner-magnify-z7f4e78j39"><div class="ldio-905eu4zn7tq">
+                    <div><div><div></div><div></div></div></div>
+                    </div></div>
+                <h2>Masukkan USB</h2>
+                <p style="font-size: x-small; color: red;">(bila sudah terpasang, dimohon untuk memasukkan ulang)</p>
+            </div>
+        </div>
     </div>
 </div>
 

@@ -8,11 +8,6 @@ module.exports = () => {
     res.render('index', { title: "Noto Maps", nav });
   })
 
-  router.get('/table', function (req, res, next) {
-    let nav = 2
-    res.render('table', { title: "Noto Table", nav });
-  })
-
   return router
 };
 

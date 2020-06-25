@@ -5,7 +5,7 @@ module.exports = () => {
 
   router.get('/', function (req, res, next) {
     let nav = 1
-    res.render('index', { title: "Noto Maps", nav });
+    res.render('index', { title: "KKP Maps", nav });
   })
 
   return router
